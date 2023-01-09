@@ -8,7 +8,7 @@ import (
 	context "context"
 	errors "errors"
 	connect_go "github.com/bufbuild/connect-go"
-	v1 "github.com/crewlinker/cqrs/proto/examples/simple/v1"
+	v1 "github.com/crewlinker/protoc-gen-appsync-go/proto/examples/simple/v1"
 	http "net/http"
 	strings "strings"
 )

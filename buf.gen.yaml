@@ -2,7 +2,7 @@ version: v1
 managed:
   enabled: true
   go_package_prefix:
-    default: github.com/crewlinker/cqrs/proto
+    default: github.com/crewlinker/protoc-gen-appsync-go/proto
     except:
       - buf.build/envoyproxy/protoc-gen-validate
 plugins:

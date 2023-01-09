@@ -37,11 +37,14 @@ Generating from protobuf RPC
 - PRO: Easily add other ways to call the API (Rest)
 - PRO: Protobuf has better tooling (buf, vs gqlgen)
 - PRO: Comes with a de-facto validation project
-- PRO: Better type support: 64-bit ints, -Infinity, Nan etc
+- PRO: Better (proper) type support: 64-bit ints, -Infinity, Nan etc
 - CON: No way to support shortcut map annotation `map<string,string>` only legacy map structures
 - CON: Not clear if we can support nested resolvers (need to provide "parent" as a field, maybe annotate)
 
 ## Backlog
 
-- [ ] Test with nested resolvers, decode the AppSync "source" field into context.Context. Generate code to
+- [ ] SHOULD Test with nested resolvers, decode the AppSync "source" field into context.Context. Generate code to
       read it from the context.
+- [ ] SHOULD test if it's feasible to validate the "source" (parent) context input to catch invalid calling
+- [ ] SHOULD test calling a query with n+1 difficulty to check if batching works
+- [ ] SHOULD test the use of AWS scalars for appsync: https://docs.aws.amazon.com/appsync/latest/devguide/scalars.html
