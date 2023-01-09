@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/crewlinker/protoc-gen-appsync-go/internal/generator"
 	"go.uber.org/zap"
 
 	"google.golang.org/protobuf/compiler/protogen"
@@ -18,6 +19,7 @@ func main() {
 
 		logs = logs.Named("protoc-gen-appsync-go")
 
+		gen := generator.New(logs)
 		for _, name := range gp.Request.FileToGenerate {
 			gf := gp.FilesByPath[name]
 			if len(gf.Services) < 1 {
@@ -25,6 +27,10 @@ func main() {
 			}
 
 			logs.Info("found file with services", zap.Int("num_services", len(gf.Services)))
+			gqlf := gp.NewGeneratedFile(fmt.Sprintf("%s.graphql", gf.GeneratedFilenamePrefix), gf.GoImportPath)
+			if err = gen.GenerateSchema(gqlf); err != nil {
+				return fmt.Errorf("failed to generate schema: %w", err)
+			}
 		}
 
 		return nil

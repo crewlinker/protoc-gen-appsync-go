@@ -1,2 +1,14 @@
 syntax = "proto3";
-package examples.nested.v1;
+package examples.nested.v1;// Example Simple service
+
+
+// NestedService
+service NestedService {
+    // KitchenSink method
+    rpc KitchenSink(KitchenSinkRequest) returns (KitchenSinkResponse);
+}
+
+// KitchenSinkRequest
+message KitchenSinkRequest{}
+// KitchenSinkResponse
+message KitchenSinkResponse{}

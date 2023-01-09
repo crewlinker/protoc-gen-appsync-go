@@ -34,3 +34,207 @@ var (
 	_ = anypb.Any{}
 	_ = sort.Sort
 )
+
+// Validate checks the field values on KitchenSinkRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *KitchenSinkRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on KitchenSinkRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// KitchenSinkRequestMultiError, or nil if none found.
+func (m *KitchenSinkRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *KitchenSinkRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return KitchenSinkRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// KitchenSinkRequestMultiError is an error wrapping multiple validation errors
+// returned by KitchenSinkRequest.ValidateAll() if the designated constraints
+// aren't met.
+type KitchenSinkRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m KitchenSinkRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m KitchenSinkRequestMultiError) AllErrors() []error { return m }
+
+// KitchenSinkRequestValidationError is the validation error returned by
+// KitchenSinkRequest.Validate if the designated constraints aren't met.
+type KitchenSinkRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e KitchenSinkRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e KitchenSinkRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e KitchenSinkRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e KitchenSinkRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e KitchenSinkRequestValidationError) ErrorName() string {
+	return "KitchenSinkRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e KitchenSinkRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sKitchenSinkRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = KitchenSinkRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = KitchenSinkRequestValidationError{}
+
+// Validate checks the field values on KitchenSinkResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *KitchenSinkResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on KitchenSinkResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// KitchenSinkResponseMultiError, or nil if none found.
+func (m *KitchenSinkResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *KitchenSinkResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return KitchenSinkResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// KitchenSinkResponseMultiError is an error wrapping multiple validation
+// errors returned by KitchenSinkResponse.ValidateAll() if the designated
+// constraints aren't met.
+type KitchenSinkResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m KitchenSinkResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m KitchenSinkResponseMultiError) AllErrors() []error { return m }
+
+// KitchenSinkResponseValidationError is the validation error returned by
+// KitchenSinkResponse.Validate if the designated constraints aren't met.
+type KitchenSinkResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e KitchenSinkResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e KitchenSinkResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e KitchenSinkResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e KitchenSinkResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e KitchenSinkResponseValidationError) ErrorName() string {
+	return "KitchenSinkResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e KitchenSinkResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sKitchenSinkResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = KitchenSinkResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = KitchenSinkResponseValidationError{}

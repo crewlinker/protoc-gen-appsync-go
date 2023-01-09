@@ -13,6 +13,7 @@ require (
 	github.com/magefile/mage v1.14.0
 	github.com/onsi/ginkgo/v2 v2.6.1
 	github.com/onsi/gomega v1.24.2
+	github.com/vektah/gqlparser v1.3.1
 	go.uber.org/zap v1.24.0
 	google.golang.org/protobuf v1.28.1
 )

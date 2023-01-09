@@ -1,6 +1,7 @@
 package appstack
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -69,19 +70,30 @@ func WithAppSync(s constructs.Construct, name string) {
 		},
 	})
 
-	// @TODO add schema file
-	_ = ds
-	// @TODO read resolvers from the generated code and setup the resolvers
-	// for _, typfield := range []string{} {
-	// 	typ, field, _ := strings.Cut(typfield, ".")
-	// 	awsappsync.NewCfnResolver(s, jsii.String(typ+field+"GraphResolver"), &awsappsync.CfnResolverProps{
-	// 		ApiId:          api.AttrApiId(),
-	// 		TypeName:       jsii.String(typ),
-	// 		FieldName:      jsii.String(field),
-	// 		DataSourceName: ds.AttrName(),
-	// 		MaxBatchSize:   jsii.Number(10), // enable batching for direct lambda
-	// 	}).AddDependency(schema)
-	// }
+	// read the schema file
+	def, err := os.ReadFile(filepath.Join("..", "proto", "examples", lname, "v1", lname+".graphql"))
+	if err != nil {
+		panic("failed to load graphql definition: " + err.Error())
+	}
+
+	// define the schema for the api
+	schema := awsappsync.NewCfnGraphQLSchema(s, jsii.String("Schema"), &awsappsync.CfnGraphQLSchemaProps{
+		ApiId:      api.AttrApiId(),
+		Definition: jsii.String(string(def)),
+	})
+
+	for _, typfield := range []string{
+		// @TODO generate type/field listing for resolver
+	} {
+		typ, field, _ := strings.Cut(typfield, ".")
+		awsappsync.NewCfnResolver(s, jsii.String(typ+field+"Resolver"), &awsappsync.CfnResolverProps{
+			ApiId:          api.AttrApiId(),
+			TypeName:       jsii.String(typ),
+			FieldName:      jsii.String(field),
+			DataSourceName: ds.AttrName(),
+			MaxBatchSize:   jsii.Number(10), // enable batching for direct lambda
+		}).AddDependency(schema)
+	}
 
 	// Output so we can test the AppSync api e2e
 	awscdk.NewCfnOutput(s, jsii.String("HttpURL"), &awscdk.CfnOutputProps{

@@ -19,6 +19,9 @@ side is using resilient protobuf specced rpc.
 - The return message is protojson encoded as the return value (might not support top-level scalar returns)
 - In case of nested resolvers. We decode the "source" field into a message and provide it through the context.Context
 - Provide original request, including selectionset (parsed and unparsed) through the context.
+- For each rpc method, it can be annotated to be "hooked up" to a type (Query, Mutation, nested). The value
+  type of the field and the response type of the rpc method must be the same. The field must exist on the
+  message with the same name (maybe add a annotation to customize the name)
 
 ## Why AppSync
 
