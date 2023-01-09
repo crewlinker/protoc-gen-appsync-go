@@ -1,0 +1,7 @@
+type EchoResponse {
+	message: String!
+}
+type Query {
+	echo: EchoResponse!
+	version: String!
+}

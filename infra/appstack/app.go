@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2/awslogs"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
+	nestedv1 "github.com/crewlinker/protoc-gen-appsync-go/proto/examples/nested/v1"
 )
 
 // WithResources builds the resources for the instanced app stack
@@ -19,12 +20,22 @@ func WithResources(s constructs.Construct) {
 	for _, name := range []string{
 		"Nested", "Simple",
 	} {
-		WithAppSync(s, name)
+		var resolves []string
+		switch name {
+		case "Nested":
+			resolves = nestedv1.ResolveSelectors
+		case "Simple":
+			resolves = nestedv1.ResolveSelectors
+		default:
+			panic("unsupported: " + name)
+		}
+
+		WithAppSync(s, name, resolves)
 	}
 }
 
 // WithAppSync will setup an appsync api with a single lambda resolver
-func WithAppSync(s constructs.Construct, name string) {
+func WithAppSync(s constructs.Construct, name string, resolves []string) {
 	s, lname := constructs.NewConstruct(s, jsii.String(name+"Graph")), strings.ToLower(name)
 
 	// Setup the AppSync api
@@ -41,7 +52,7 @@ func WithAppSync(s constructs.Construct, name string) {
 	})
 
 	// Lambda resolver
-	lambda := awslambda.NewFunction(s, jsii.String("Resolver"), &awslambda.FunctionProps{
+	lambda := awslambda.NewFunction(s, jsii.String("Handler"), &awslambda.FunctionProps{
 		Code:         awslambda.AssetCode_FromAsset(jsii.String(filepath.Join("..", "lambda", "example"+lname, "pkg.zip")), nil),
 		Handler:      jsii.String("bootstrap"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
@@ -82,9 +93,8 @@ func WithAppSync(s constructs.Construct, name string) {
 		Definition: jsii.String(string(def)),
 	})
 
-	for _, typfield := range []string{
-		// @TODO generate type/field listing for resolver
-	} {
+	// add resolves to the field
+	for _, typfield := range resolves {
 		typ, field, _ := strings.Cut(typfield, ".")
 		awsappsync.NewCfnResolver(s, jsii.String(typ+field+"Resolver"), &awsappsync.CfnResolverProps{
 			ApiId:          api.AttrApiId(),

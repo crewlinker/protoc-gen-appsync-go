@@ -35,6 +35,135 @@ var (
 	_ = sort.Sort
 )
 
+// Validate checks the field values on Query with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Query) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Query with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in QueryMultiError, or nil if none found.
+func (m *Query) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Query) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetEcho()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, QueryValidationError{
+					field:  "Echo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, QueryValidationError{
+					field:  "Echo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetEcho()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return QueryValidationError{
+				field:  "Echo",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Version
+
+	if len(errors) > 0 {
+		return QueryMultiError(errors)
+	}
+
+	return nil
+}
+
+// QueryMultiError is an error wrapping multiple validation errors returned by
+// Query.ValidateAll() if the designated constraints aren't met.
+type QueryMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m QueryMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m QueryMultiError) AllErrors() []error { return m }
+
+// QueryValidationError is the validation error returned by Query.Validate if
+// the designated constraints aren't met.
+type QueryValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e QueryValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e QueryValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e QueryValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e QueryValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e QueryValidationError) ErrorName() string { return "QueryValidationError" }
+
+// Error satisfies the builtin error interface
+func (e QueryValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sQuery.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = QueryValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = QueryValidationError{}
+
 // Validate checks the field values on EchoRequest with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -236,3 +365,205 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = EchoResponseValidationError{}
+
+// Validate checks the field values on VersionRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *VersionRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on VersionRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in VersionRequestMultiError,
+// or nil if none found.
+func (m *VersionRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *VersionRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return VersionRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// VersionRequestMultiError is an error wrapping multiple validation errors
+// returned by VersionRequest.ValidateAll() if the designated constraints
+// aren't met.
+type VersionRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m VersionRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m VersionRequestMultiError) AllErrors() []error { return m }
+
+// VersionRequestValidationError is the validation error returned by
+// VersionRequest.Validate if the designated constraints aren't met.
+type VersionRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e VersionRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e VersionRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e VersionRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e VersionRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e VersionRequestValidationError) ErrorName() string { return "VersionRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e VersionRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sVersionRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = VersionRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = VersionRequestValidationError{}
+
+// Validate checks the field values on VersionResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *VersionResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on VersionResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// VersionResponseMultiError, or nil if none found.
+func (m *VersionResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *VersionResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Version
+
+	if len(errors) > 0 {
+		return VersionResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// VersionResponseMultiError is an error wrapping multiple validation errors
+// returned by VersionResponse.ValidateAll() if the designated constraints
+// aren't met.
+type VersionResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m VersionResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m VersionResponseMultiError) AllErrors() []error { return m }
+
+// VersionResponseValidationError is the validation error returned by
+// VersionResponse.Validate if the designated constraints aren't met.
+type VersionResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e VersionResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e VersionResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e VersionResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e VersionResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e VersionResponseValidationError) ErrorName() string { return "VersionResponseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e VersionResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sVersionResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = VersionResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = VersionResponseValidationError{}

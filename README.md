@@ -51,3 +51,9 @@ Generating from protobuf RPC
 - [ ] SHOULD test if it's feasible to validate the "source" (parent) context input to catch invalid calling
 - [ ] SHOULD test calling a query with n+1 difficulty to check if batching works
 - [ ] SHOULD test the use of AWS scalars for appsync: https://docs.aws.amazon.com/appsync/latest/devguide/scalars.html
+- [ ] MUST TEST add test case that checks with "resolve_field" method option set
+- [ ] MUST TEST a resolver on the top level mutation type (should create type definition)
+- [ ] MUST TEST optional field, vs required field
+- [ ] MUST TEST enum field
+- [ ] SHOULD add an "ignore" option to not add the field to the graphql schema
+- [ ] SHOULD handle empty protobuf messages not turning into invalid graphql schemas

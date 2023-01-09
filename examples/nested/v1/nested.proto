@@ -1,7 +1,6 @@
 syntax = "proto3";
 package examples.nested.v1;// Example Simple service
 
-
 // NestedService
 service NestedService {
     // KitchenSink method
@@ -12,3 +11,9 @@ service NestedService {
 message KitchenSinkRequest{}
 // KitchenSinkResponse
 message KitchenSinkResponse{}
+
+// Query top level message
+message Query {
+    // message of the day
+    string motd = 1;
+}

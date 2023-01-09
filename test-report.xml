@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <testsuites tests="0" disabled="0" errors="0" failures="0" time="0.019631">
+      <testsuite name="tests" package="/Users/adam/Documents/Projects/github.com/crewlinker/protoc-gen-appsync-go/e2etests" tests="0" disabled="0" skipped="0" errors="0" failures="0" time="0.008296" timestamp="2023-01-09T15:21:21">
+          <properties>
+              <property name="SuiteSucceeded" value="true"></property>
+              <property name="SuiteHasProgrammaticFocus" value="false"></property>
+              <property name="SpecialSuiteFailureReason" value=""></property>
+              <property name="SuiteLabels" value="[]"></property>
+              <property name="RandomSeed" value="1673274081"></property>
+              <property name="RandomizeAllSpecs" value="true"></property>
+              <property name="LabelFilter" value=""></property>
+              <property name="FocusStrings" value=""></property>
+              <property name="SkipStrings" value=""></property>
+              <property name="FocusFiles" value=""></property>
+              <property name="SkipFiles" value=""></property>
+              <property name="FailOnPending" value="true"></property>
+              <property name="FailFast" value="false"></property>
+              <property name="FlakeAttempts" value="0"></property>
+              <property name="DryRun" value="false"></property>
+              <property name="ParallelTotal" value="7"></property>
+              <property name="OutputInterceptorMode" value=""></property>
+          </properties>
+      </testsuite>
+      <testsuite name="internal/generator" package="/Users/adam/Documents/Projects/github.com/crewlinker/protoc-gen-appsync-go/internal/generator" tests="0" disabled="0" skipped="0" errors="0" failures="0" time="0.011335" timestamp="2023-01-09T15:21:21">
+          <properties>
+              <property name="SuiteSucceeded" value="true"></property>
+              <property name="SuiteHasProgrammaticFocus" value="false"></property>
+              <property name="SpecialSuiteFailureReason" value=""></property>
+              <property name="SuiteLabels" value="[]"></property>
+              <property name="RandomSeed" value="1673274081"></property>
+              <property name="RandomizeAllSpecs" value="true"></property>
+              <property name="LabelFilter" value=""></property>
+              <property name="FocusStrings" value=""></property>
+              <property name="SkipStrings" value=""></property>
+              <property name="FocusFiles" value=""></property>
+              <property name="SkipFiles" value=""></property>
+              <property name="FailOnPending" value="true"></property>
+              <property name="FailFast" value="false"></property>
+              <property name="FlakeAttempts" value="0"></property>
+              <property name="DryRun" value="false"></property>
+              <property name="ParallelTotal" value="7"></property>
+              <property name="OutputInterceptorMode" value=""></property>
+          </properties>
+      </testsuite>
+  </testsuites>

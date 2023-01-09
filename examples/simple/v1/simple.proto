@@ -1,11 +1,29 @@
 syntax = "proto3";
 package examples.simple.v1;
 
+// import our annotations
+import "appsync/v1/appsync.proto";
+
+// import well-known
+import "google/protobuf/empty.proto";
+
 // Example Simple service
 service SimpleService {
-
     // Echo method returns a string argument
     rpc Echo(EchoRequest) returns (EchoResponse);
+    // Version resolves to return a scalar string value
+    rpc Version(VersionRequest) returns (VersionResponse);
+}
+
+// Query describes the top-level query object 
+message Query {
+    // echo field is resolved by the rpc method above. the "response" type MUST match the field
+    // type and method on the service MUST exist. The "Request" will be turned into arguments 
+    // unless it's an empty message.
+    EchoResponse echo = 1 [(appsync.v1.field).resolver="SimpleService.Echo"];
+    // version resolves to a scalar type. which requires a extra option to configure the 
+    // field in the response type that will hold the resolving value.
+    string version = 2 [(appsync.v1.field).resolver="SimpleService.Version", (appsync.v1.field).value_field="version"];
 }
 
 // EchoRequest sends a message to be echoed
@@ -18,4 +36,13 @@ message EchoRequest {
 message EchoResponse {
     // returned message 
     string message = 1; 
+};
+
+// VersionRequests asks for the version
+message VersionRequest {};
+
+// VersionResponse returns the version
+message VersionResponse {
+    // the field that holds the actual version
+    string version = 1; 
 };

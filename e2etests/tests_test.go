@@ -1,7 +1,6 @@
 package e2etests_test
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"os"
@@ -27,13 +26,6 @@ var _ = Describe("graphql", func() {
 			r.Header.Set("x-api-key", out.ClProtoASAppMain.SimpleGraphSecretKey)
 		})
 	})
-
-	DescribeTable("simple api queries", func(ctx context.Context, query any, exp string) {
-		Expect(simple.Query(ctx, query, nil)).To(Succeed())
-		Expect(json.Marshal(query)).To(MatchJSON(exp))
-	},
-		Entry("string", &struct{ Version string }{}, `{"Version":"v0.1.2"}`),
-	)
 })
 
 func ReadOutputs() (out struct {

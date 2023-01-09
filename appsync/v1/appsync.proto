@@ -1,0 +1,30 @@
+syntax = "proto2";
+package appsync.v1;
+
+import "google/protobuf/descriptor.proto";
+
+// MethodOptions presents options for rpc methods to acts as resolves for types in the graphql graph
+message MethodOptions {
+    // configures on which named object type the method is a resolver on
+    optional string resolve_on = 1;
+    // configures what field will be resolved by the method. This defaults to the lowerCamelCase of 
+    // the method name.
+    optional string resolve_field = 2;
+}
+
+// extend the default method options
+extend google.protobuf.MethodOptions {
+    optional MethodOptions method = 1099;
+}
+
+// FieldOptions presents options to configure fields to interact with protobuf powered rpc
+message FieldOptions {
+    // resolve configures a <Service>.<Method> that resolves the field
+    optional string resolver = 1;
+    // configures wich value in the response message holds the resolved value
+    optional string value_field = 2;
+}
+
+extend google.protobuf.FieldOptions {
+    optional FieldOptions field = 1098;
+}

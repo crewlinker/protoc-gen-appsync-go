@@ -29,6 +29,8 @@ const (
 type SimpleServiceClient interface {
 	// Echo method returns a string argument
 	Echo(context.Context, *connect_go.Request[v1.EchoRequest]) (*connect_go.Response[v1.EchoResponse], error)
+	// Version resolves to return a scalar string value
+	Version(context.Context, *connect_go.Request[v1.VersionRequest]) (*connect_go.Response[v1.VersionResponse], error)
 }
 
 // NewSimpleServiceClient constructs a client for the examples.simple.v1.SimpleService service. By
@@ -46,12 +48,18 @@ func NewSimpleServiceClient(httpClient connect_go.HTTPClient, baseURL string, op
 			baseURL+"/examples.simple.v1.SimpleService/Echo",
 			opts...,
 		),
+		version: connect_go.NewClient[v1.VersionRequest, v1.VersionResponse](
+			httpClient,
+			baseURL+"/examples.simple.v1.SimpleService/Version",
+			opts...,
+		),
 	}
 }
 
 // simpleServiceClient implements SimpleServiceClient.
 type simpleServiceClient struct {
-	echo *connect_go.Client[v1.EchoRequest, v1.EchoResponse]
+	echo    *connect_go.Client[v1.EchoRequest, v1.EchoResponse]
+	version *connect_go.Client[v1.VersionRequest, v1.VersionResponse]
 }
 
 // Echo calls examples.simple.v1.SimpleService.Echo.
@@ -59,10 +67,17 @@ func (c *simpleServiceClient) Echo(ctx context.Context, req *connect_go.Request[
 	return c.echo.CallUnary(ctx, req)
 }
 
+// Version calls examples.simple.v1.SimpleService.Version.
+func (c *simpleServiceClient) Version(ctx context.Context, req *connect_go.Request[v1.VersionRequest]) (*connect_go.Response[v1.VersionResponse], error) {
+	return c.version.CallUnary(ctx, req)
+}
+
 // SimpleServiceHandler is an implementation of the examples.simple.v1.SimpleService service.
 type SimpleServiceHandler interface {
 	// Echo method returns a string argument
 	Echo(context.Context, *connect_go.Request[v1.EchoRequest]) (*connect_go.Response[v1.EchoResponse], error)
+	// Version resolves to return a scalar string value
+	Version(context.Context, *connect_go.Request[v1.VersionRequest]) (*connect_go.Response[v1.VersionResponse], error)
 }
 
 // NewSimpleServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -77,6 +92,11 @@ func NewSimpleServiceHandler(svc SimpleServiceHandler, opts ...connect_go.Handle
 		svc.Echo,
 		opts...,
 	))
+	mux.Handle("/examples.simple.v1.SimpleService/Version", connect_go.NewUnaryHandler(
+		"/examples.simple.v1.SimpleService/Version",
+		svc.Version,
+		opts...,
+	))
 	return "/examples.simple.v1.SimpleService/", mux
 }
 
@@ -85,4 +105,8 @@ type UnimplementedSimpleServiceHandler struct{}
 
 func (UnimplementedSimpleServiceHandler) Echo(context.Context, *connect_go.Request[v1.EchoRequest]) (*connect_go.Response[v1.EchoResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("examples.simple.v1.SimpleService.Echo is not implemented"))
+}
+
+func (UnimplementedSimpleServiceHandler) Version(context.Context, *connect_go.Request[v1.VersionRequest]) (*connect_go.Response[v1.VersionResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("examples.simple.v1.SimpleService.Version is not implemented"))
 }
