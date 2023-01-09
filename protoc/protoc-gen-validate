@@ -1,0 +1,2 @@
+#!/bin/sh
+exec go run -mod=readonly github.com/envoyproxy/protoc-gen-validate "$@"

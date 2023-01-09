@@ -1,0 +1,21 @@
+syntax = "proto3";
+package examples.simple.v1;
+
+// Example Simple service
+service SimpleService {
+
+    // Echo method returns a string argument
+    rpc Echo(EchoRequest) returns (EchoResponse);
+}
+
+// EchoRequest sends a message to be echoed
+message EchoRequest { 
+    // message to echo
+    string message = 1; 
+};
+
+// EchoResponse sends a message to be echoed
+message EchoResponse {
+    // returned message 
+    string message = 1; 
+};

@@ -1,0 +1,13 @@
+version: v1
+name: buf.build/crewlinker/protoc-gen-appsync-go
+lint:
+  use:
+    - DEFAULT
+    - COMMENTS
+    - UNARY_RPC
+    - PACKAGE_NO_IMPORT_CYCLE
+breaking:
+  use:
+    - FILE
+deps:
+  - buf.build/envoyproxy/protoc-gen-validate

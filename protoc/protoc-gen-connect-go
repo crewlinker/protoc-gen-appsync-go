@@ -1,0 +1,2 @@
+#!/bin/sh
+exec go run -mod=readonly github.com/bufbuild/connect-go/cmd/protoc-gen-connect-go "$@"
