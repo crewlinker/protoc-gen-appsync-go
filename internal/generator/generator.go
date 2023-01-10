@@ -3,6 +3,7 @@ package generator
 import (
 	"embed"
 	"fmt"
+	"strconv"
 	"text/template"
 
 	"github.com/vektah/gqlparser/v2/ast"
@@ -35,6 +36,10 @@ func New(logs *zap.Logger, opts *Options) (g *Generator, err error) {
 		opts: *opts,
 	}
 
+	g.tmpl = g.tmpl.Funcs(template.FuncMap{
+		"unquote": strconv.Unquote,
+	})
+
 	g.tmpl, err = g.tmpl.ParseFS(tmplfs, "*.gotmpl")
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse templates: %w", err)
@@ -45,12 +50,16 @@ func New(logs *zap.Logger, opts *Options) (g *Generator, err error) {
 
 // NewTarget initializes a new target
 func (g *Generator) NewTarget(pf *protogen.File) *Target {
-	return &Target{
+	tg := &Target{
 		gen:  g,
 		file: pf,
 		sch:  &ast.Schema{Types: make(map[string]*ast.Definition)},
-
-		resolvers: make(map[string]*protogen.Method),
-		resolves:  make(map[string]*protogen.Method),
 	}
+
+	tg.resolvers.mapped = make(map[string]*protogen.Method)
+	tg.resolvers.unmapped = make(map[string]*protogen.Method)
+	tg.resolvers.services = make(map[*protogen.Service]struct{})
+	tg.resolvers.methods = make(map[*protogen.Method]struct{})
+
+	return tg
 }

@@ -1,5 +1,16 @@
 package {{.GoPackageName}}
 
+{{ if .Resolvers }}
+import (
+    "fmt"
+    "context"
+    "google.golang.org/protobuf/encoding/protojson"
+    connectgo "github.com/bufbuild/connect-go"
+)
+{{ end }}
+
+// 
+
 // ResolveSelectors list all type and field names that are resolved by the protobuf rpc methods. This
 // is usefull to automate hooking up lambda functions to them in AppSync using a tool like AWS CDK.
 var ResolveSelectors = []string{
@@ -7,3 +18,49 @@ var ResolveSelectors = []string{
     "{{$qualifier}}",
     {{- end }}
 }
+
+{{ range $svc, $el := .ResolverServices }}
+// {{$svc.GoName}}Resolver describes the resolver implementation using connect signatures.
+type {{$svc.GoName}}Resolver interface{
+    {{ range $met, $el := $.ResolverMethods }}
+    {{ if eq $met.Parent $svc }}
+
+    {{ $met.GoName }}(context.Context, *connectgo.Request[{{$met.Input.GoIdent.GoName}}]) (*connectgo.Response[{{$met.Output.GoIdent.GoName}}], error)
+
+    {{ end }}
+    {{- end }}
+}
+{{ end }}
+
+{{ range $svc, $el := .ResolverServices }}
+// Resolve{{$svc.GoName}} resolves graphql calls
+func Resolve{{$svc.GoName}}(ctx context.Context, h {{$svc.GoName}}Resolver, typName, fldName string, args []byte) (data []byte, err error) {
+    qualifier := fmt.Sprintf("%s.%s", typName, fldName)
+    switch qualifier {
+        {{ range $qualifier, $res := $.Resolvers }}
+        {{ if eq $res.Parent $svc }}
+        case "{{$qualifier}}":
+            var in {{$res.Input.GoIdent.GoName}}
+            if err := protojson.Unmarshal(args, &in); err != nil {
+                return nil, fmt.Errorf("failed to unmarshal input: %w", err)
+            }
+
+            req := connectgo.NewRequest(&in)
+
+            resp, err := h.{{ $res.GoName}}(ctx, req)
+            if err != nil {
+                return nil, fmt.Errorf("failed to call handler: %w", err)
+            }
+
+            if data, err = protojson.Marshal(resp.Msg); err != nil {
+                return nil, fmt.Errorf("failed to marshal output: %w", err)
+            }
+
+            return data, nil
+        {{- end }}
+        {{- end }}
+        default:
+            return nil, fmt.Errorf("unsupported: %s", qualifier)
+    }
+}
+{{ end }}

@@ -16,15 +16,22 @@ type Target struct {
 	gen *Generator
 	sch *ast.Schema
 
-	file      *protogen.File
-	resolves  map[string]*protogen.Method
-	resolvers map[string]*protogen.Method
+	file *protogen.File
+
+	resolvers struct {
+		unmapped map[string]*protogen.Method
+		mapped   map[string]*protogen.Method
+		methods  map[*protogen.Method]struct{}
+		services map[*protogen.Service]struct{}
+	}
 }
 
 // TargetData is exposed to our templates
 type TargetData struct {
 	*protogen.File
-	Resolvers map[string]*protogen.Method
+	Resolvers        map[string]*protogen.Method
+	ResolverMethods  map[*protogen.Method]struct{}
+	ResolverServices map[*protogen.Service]struct{}
 }
 
 // Generate the target and write an graph schema and resolver code.
@@ -36,7 +43,12 @@ func (tg *Target) Generate(graphw, resolvew io.Writer) error {
 			mopts := MethodOptions(met)
 			if mopts != nil && len(mopts.Resolves) > 0 {
 				for _, res := range mopts.Resolves {
-					tg.resolves[res] = met
+					// unmapped resolvers will be mapped during schema generation
+					tg.resolvers.unmapped[res] = met
+
+					// map unique services that resolve
+					tg.resolvers.methods[met] = struct{}{}
+					tg.resolvers.services[met.Parent] = struct{}{}
 				}
 			}
 		}
@@ -48,8 +60,8 @@ func (tg *Target) Generate(graphw, resolvew io.Writer) error {
 	}
 
 	// fail if resolving was configured but no field hooked it up after generating the schema
-	if len(tg.resolves) > 0 {
-		for q, met := range tg.resolves {
+	if len(tg.resolvers.unmapped) > 0 {
+		for q, met := range tg.resolvers.unmapped {
 			return fmt.Errorf("%s.%s resolves field '%s' but it was not found under the root messages (%s, %s or %s)",
 				met.Parent.Desc.Name(), met.Desc.Name(),
 				q,
@@ -63,9 +75,13 @@ func (tg *Target) Generate(graphw, resolvew io.Writer) error {
 	formatter.NewFormatter(graphw).FormatSchema(tg.sch)
 
 	// generate and output the resolving code
+	// @TODO what if services are spread over multiple files, we'll generate one per file
+
 	if err := tg.gen.tmpl.ExecuteTemplate(resolvew, "resolve.gotmpl", TargetData{
-		File:      tg.file,
-		Resolvers: tg.resolvers,
+		File:             tg.file,
+		Resolvers:        tg.resolvers.mapped,
+		ResolverMethods:  tg.resolvers.methods,
+		ResolverServices: tg.resolvers.services,
 	}); err != nil {
 		return fmt.Errorf("failed to generate resolving code: %w", err)
 	}
@@ -127,13 +143,13 @@ func (tg *Target) generateField(isInput bool, fld *protogen.Field) (def *ast.Fie
 	// if a rpc method was configured to be resolving this field, add any arguments
 	protoQualifier := fmt.Sprintf("%s.%s", fld.Parent.Desc.Name(), fld.Desc.Name())
 	graphQualifier := fmt.Sprintf("%s.%s", fld.Parent.Desc.Name(), fld.Desc.JSONName())
-	if resolver, ok := tg.resolves[protoQualifier]; ok {
+	if resolver, ok := tg.resolvers.unmapped[protoQualifier]; ok {
 		if def.Arguments, err = tg.generateArguments(fld, resolver); err != nil {
 			return nil, fmt.Errorf("failed to generate arguments: %w", err)
 		}
 
-		delete(tg.resolves, protoQualifier)     // remove from map so we can error if some resolves failed
-		tg.resolvers[graphQualifier] = resolver // add to resolver map for generating go resolver code
+		delete(tg.resolvers.unmapped, protoQualifier)  // remove from map so we can error if some resolves failed
+		tg.resolvers.mapped[graphQualifier] = resolver // add to resolver map for generating go resolver code
 	}
 
 	// the explicit optional keyword is different from the "optional" cardinality
