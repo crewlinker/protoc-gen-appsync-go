@@ -10,11 +10,10 @@ require (
 	github.com/bufbuild/connect-go v1.4.1
 	github.com/envoyproxy/protoc-gen-validate v0.9.1
 	github.com/hasura/go-graphql-client v0.8.1
-	github.com/iancoleman/strcase v0.2.0
 	github.com/magefile/mage v1.14.0
 	github.com/onsi/ginkgo/v2 v2.6.1
 	github.com/onsi/gomega v1.24.2
-	github.com/vektah/gqlparser v1.3.1
+	github.com/vektah/gqlparser/v2 v2.5.1
 	go.uber.org/zap v1.24.0
 	google.golang.org/protobuf v1.28.1
 )
@@ -30,6 +29,7 @@ require (
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/pprof v0.0.0-20210407192527-94a9f03dee38 // indirect
 	github.com/google/uuid v1.3.0 // indirect
+	github.com/iancoleman/strcase v0.2.0 // indirect
 	github.com/klauspost/compress v1.10.3 // indirect
 	github.com/lyft/protoc-gen-star v0.6.1 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect

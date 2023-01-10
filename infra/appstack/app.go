@@ -13,6 +13,7 @@ import (
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
 	nestedv1 "github.com/crewlinker/protoc-gen-appsync-go/proto/examples/nested/v1"
+	simplev1 "github.com/crewlinker/protoc-gen-appsync-go/proto/examples/simple/v1"
 )
 
 // WithResources builds the resources for the instanced app stack
@@ -25,7 +26,7 @@ func WithResources(s constructs.Construct) {
 		case "Nested":
 			resolves = nestedv1.ResolveSelectors
 		case "Simple":
-			resolves = nestedv1.ResolveSelectors
+			resolves = simplev1.ResolveSelectors
 		default:
 			panic("unsupported: " + name)
 		}
@@ -41,7 +42,7 @@ func WithAppSync(s constructs.Construct, name string, resolves []string) {
 	// Setup the AppSync api
 	api := awsappsync.NewCfnGraphQLApi(s, jsii.String("Api"), &awsappsync.CfnGraphQLApiProps{
 		AuthenticationType: jsii.String("API_KEY"),
-		Name:               jsii.String(*awscdk.Stack_Of(s).StackName() + "Graph"),
+		Name:               jsii.String(*awscdk.Stack_Of(s).StackName() + name + "Graph"),
 	})
 
 	// setup an api key so we  can use the AWS query interface

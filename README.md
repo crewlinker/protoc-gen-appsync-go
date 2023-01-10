@@ -29,6 +29,15 @@ side is using resilient protobuf specced rpc.
 - PRO: Build-in subscription support, easily update clients of changes wihout a custom websocket protocol
 - PRO: Allows clients to use advanced graphql tooling (i.e Relay)
 
+## Options design
+
+Add options to field for resolving
+
+- Pro: can have a single rpc method resolving multiple fields (how common?)
+- Con: what if the message is in separate file
+
+Add options to method to indicate what it resolves
+
 ## Other approaches
 
 Generating just resolvers from GraphQl schema.
@@ -46,6 +55,7 @@ Generating from protobuf RPC
 
 ## Backlog
 
+- [ ] MUST rewrite to keep state per file, generator is initialized per file
 - [ ] SHOULD Test with nested resolvers, decode the AppSync "source" field into context.Context. Generate code to
       read it from the context.
 - [ ] SHOULD test if it's feasible to validate the "source" (parent) context input to catch invalid calling
@@ -55,5 +65,11 @@ Generating from protobuf RPC
 - [ ] MUST TEST a resolver on the top level mutation type (should create type definition)
 - [ ] MUST TEST optional field, vs required field
 - [ ] MUST TEST enum field
+- [ ] MUST TEST repeated field
+- [ ] MUST TEST error of referencing service/method with resolver option that doesn't exist
+- [ ] MUST TEST error if response type of service/method doesn't match field value type
 - [ ] SHOULD add an "ignore" option to not add the field to the graphql schema
 - [ ] SHOULD handle empty protobuf messages not turning into invalid graphql schemas
+- [ ] SHOULD allow "default" field option (ony for input object)
+- [ ] SHOULD allow "directives" field option
+- [ ] MUST generate graphql comments from the protobuf comments

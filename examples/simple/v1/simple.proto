@@ -10,9 +10,20 @@ import "google/protobuf/empty.proto";
 // Example Simple service
 service SimpleService {
     // Echo method returns a string argument
-    rpc Echo(EchoRequest) returns (EchoResponse);
+    rpc Echo(EchoRequest) returns (EchoResponse) {
+        option(appsync.v1.method).resolves="Query.echo";
+        option(appsync.v1.method).resolves="Query.echo_v2";
+    };
+
+    // ListProfiles
+    rpc ListProfiles(ListProfilesRequest) returns (ListProfilesResponse) {
+        option(appsync.v1.method).resolves = "Query.list_profiles";
+    };
+
     // Version resolves to return a scalar string value
-    rpc Version(VersionRequest) returns (VersionResponse);
+    rpc Version(VersionRequest) returns (VersionResponse) {
+        option(appsync.v1.method).resolves="Query.latest_version";
+    };
 }
 
 // Query describes the top-level query object 
@@ -20,10 +31,33 @@ message Query {
     // echo field is resolved by the rpc method above. the "response" type MUST match the field
     // type and method on the service MUST exist. The "Request" will be turned into arguments 
     // unless it's an empty message.
-    EchoResponse echo = 1 [(appsync.v1.field).resolver="SimpleService.Echo"];
+    EchoResponse echo = 1;
+    // another field that has the same resolver
+    EchoResponse echo_v2 = 3;
+
+    // List profiles
+    ListProfilesResponse list_profiles = 4;
+
     // version resolves to a scalar type. which requires a extra option to configure the 
     // field in the response type that will hold the resolving value.
-    string version = 2 [(appsync.v1.field).resolver="SimpleService.Version", (appsync.v1.field).value_field="version"];
+    string latest_version = 2;
+}
+
+// Pagination provides a standard input for paginated results
+message Pagination {
+    // which page
+    string page = 1;
+}
+
+// Input for the ListProfile rpc
+message ListProfilesRequest { 
+    // pagination input
+    Pagination pagination = 1;
+}
+// Output for hte ListProfile rpc
+message ListProfilesResponse { 
+    // profile ids
+    repeated string profile_ids = 1;
 }
 
 // EchoRequest sends a message to be echoed

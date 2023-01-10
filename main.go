@@ -45,16 +45,12 @@ func main() {
 			}
 
 			logs.Info("found file with services", zap.Int("num_services", len(pf.Services)))
-			resf, gqlf :=
+			resolvef, graphf :=
 				gp.NewGeneratedFile(fmt.Sprintf("%s.res.go", pf.GeneratedFilenamePrefix), pf.GoImportPath),
 				gp.NewGeneratedFile(fmt.Sprintf("%s.graphql", pf.GeneratedFilenamePrefix), pf.GoImportPath)
 
-			if err = gen.GenerateResolve(resf, pf); err != nil {
-				return fmt.Errorf("failed to generate resolver code: %w", err)
-			}
-
-			if err = gen.GenerateSchema(gqlf, pf); err != nil {
-				return fmt.Errorf("failed to generate schema: %w", err)
+			if err := gen.NewTarget(pf).Generate(graphf, resolvef); err != nil {
+				return fmt.Errorf("failed to generate for '%s': %w", *pf.Proto.Name, err)
 			}
 		}
 

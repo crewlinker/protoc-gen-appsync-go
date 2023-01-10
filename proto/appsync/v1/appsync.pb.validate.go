@@ -57,10 +57,6 @@ func (m *MethodOptions) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for ResolveOn
-
-	// no validation rules for ResolveField
-
 	if len(errors) > 0 {
 		return MethodOptionsMultiError(errors)
 	}
@@ -161,9 +157,7 @@ func (m *FieldOptions) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Resolver
-
-	// no validation rules for ValueField
+	// no validation rules for Ignore
 
 	if len(errors) > 0 {
 		return FieldOptionsMultiError(errors)

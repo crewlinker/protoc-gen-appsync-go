@@ -1,7 +1,15 @@
 type EchoResponse {
 	message: String!
 }
+type ListProfilesResponse {
+	profileIds: [String!]!
+}
+input PaginationInput {
+	page: String!
+}
 type Query {
-	echo: EchoResponse!
-	version: String!
+	echo(message: String!): EchoResponse!
+	echoV2(message: String!): EchoResponse!
+	listProfiles(pagination: PaginationInput!): ListProfilesResponse!
+	latestVersion: String!
 }
