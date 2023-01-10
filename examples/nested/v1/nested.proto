@@ -1,19 +1,54 @@
 syntax = "proto3";
 package examples.nested.v1;// Example Simple service
 
+// import our annotations
+import "appsync/v1/appsync.proto";
+
 // NestedService
-service NestedService {
-    // KitchenSink method
-    rpc KitchenSink(KitchenSinkRequest) returns (KitchenSinkResponse);
+service PostService {
+    // Post listing method
+    rpc Posts(PostsRequest) returns (PostsResponse) {
+        option(appsync.v1.method).resolves="Query.posts";
+    };
+
+    // related posts from a single post
+    rpc RelatedPosts(RelatedPostsRequest) returns (RelatedPostsResponse){
+        option(appsync.v1.method).resolves="Post.related";
+    };
 }
 
-// KitchenSinkRequest
-message KitchenSinkRequest{}
-// KitchenSinkResponse
-message KitchenSinkResponse{}
+
+// message post describes a post
+message Post {    
+    // identifies the posts
+    string id = 1;
+    // related posts
+    repeated Post related = 2;
+}
 
 // Query top level message
 message Query {
     // message of the day
-    string motd = 1;
+    PostsResponse posts = 1;
+}
+
+// Request posts related to another post
+message RelatedPostsRequest {
+    // for which we find related posts
+    Post parent = 1 [(appsync.v1.field).ignore=true];
+}
+
+// Response with related posts
+message RelatedPostsResponse {
+    // list of related posts
+    repeated Post posts = 1;
+}
+
+// PostsRequest
+message PostsRequest{}
+
+// PostsResponse
+message PostsResponse{
+    // posts in the response
+    repeated Post posts = 1;
 }

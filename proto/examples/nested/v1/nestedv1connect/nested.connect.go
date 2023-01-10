@@ -21,68 +21,92 @@ import (
 const _ = connect_go.IsAtLeastVersion0_1_0
 
 const (
-	// NestedServiceName is the fully-qualified name of the NestedService service.
-	NestedServiceName = "examples.nested.v1.NestedService"
+	// PostServiceName is the fully-qualified name of the PostService service.
+	PostServiceName = "examples.nested.v1.PostService"
 )
 
-// NestedServiceClient is a client for the examples.nested.v1.NestedService service.
-type NestedServiceClient interface {
-	// KitchenSink method
-	KitchenSink(context.Context, *connect_go.Request[v1.KitchenSinkRequest]) (*connect_go.Response[v1.KitchenSinkResponse], error)
+// PostServiceClient is a client for the examples.nested.v1.PostService service.
+type PostServiceClient interface {
+	// Post listing method
+	Posts(context.Context, *connect_go.Request[v1.PostsRequest]) (*connect_go.Response[v1.PostsResponse], error)
+	// related posts from a single post
+	RelatedPosts(context.Context, *connect_go.Request[v1.RelatedPostsRequest]) (*connect_go.Response[v1.RelatedPostsResponse], error)
 }
 
-// NewNestedServiceClient constructs a client for the examples.nested.v1.NestedService service. By
+// NewPostServiceClient constructs a client for the examples.nested.v1.PostService service. By
 // default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
 // and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
 // connect.WithGRPC() or connect.WithGRPCWeb() options.
 //
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
 // http://api.acme.com or https://acme.com/grpc).
-func NewNestedServiceClient(httpClient connect_go.HTTPClient, baseURL string, opts ...connect_go.ClientOption) NestedServiceClient {
+func NewPostServiceClient(httpClient connect_go.HTTPClient, baseURL string, opts ...connect_go.ClientOption) PostServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
-	return &nestedServiceClient{
-		kitchenSink: connect_go.NewClient[v1.KitchenSinkRequest, v1.KitchenSinkResponse](
+	return &postServiceClient{
+		posts: connect_go.NewClient[v1.PostsRequest, v1.PostsResponse](
 			httpClient,
-			baseURL+"/examples.nested.v1.NestedService/KitchenSink",
+			baseURL+"/examples.nested.v1.PostService/Posts",
+			opts...,
+		),
+		relatedPosts: connect_go.NewClient[v1.RelatedPostsRequest, v1.RelatedPostsResponse](
+			httpClient,
+			baseURL+"/examples.nested.v1.PostService/RelatedPosts",
 			opts...,
 		),
 	}
 }
 
-// nestedServiceClient implements NestedServiceClient.
-type nestedServiceClient struct {
-	kitchenSink *connect_go.Client[v1.KitchenSinkRequest, v1.KitchenSinkResponse]
+// postServiceClient implements PostServiceClient.
+type postServiceClient struct {
+	posts        *connect_go.Client[v1.PostsRequest, v1.PostsResponse]
+	relatedPosts *connect_go.Client[v1.RelatedPostsRequest, v1.RelatedPostsResponse]
 }
 
-// KitchenSink calls examples.nested.v1.NestedService.KitchenSink.
-func (c *nestedServiceClient) KitchenSink(ctx context.Context, req *connect_go.Request[v1.KitchenSinkRequest]) (*connect_go.Response[v1.KitchenSinkResponse], error) {
-	return c.kitchenSink.CallUnary(ctx, req)
+// Posts calls examples.nested.v1.PostService.Posts.
+func (c *postServiceClient) Posts(ctx context.Context, req *connect_go.Request[v1.PostsRequest]) (*connect_go.Response[v1.PostsResponse], error) {
+	return c.posts.CallUnary(ctx, req)
 }
 
-// NestedServiceHandler is an implementation of the examples.nested.v1.NestedService service.
-type NestedServiceHandler interface {
-	// KitchenSink method
-	KitchenSink(context.Context, *connect_go.Request[v1.KitchenSinkRequest]) (*connect_go.Response[v1.KitchenSinkResponse], error)
+// RelatedPosts calls examples.nested.v1.PostService.RelatedPosts.
+func (c *postServiceClient) RelatedPosts(ctx context.Context, req *connect_go.Request[v1.RelatedPostsRequest]) (*connect_go.Response[v1.RelatedPostsResponse], error) {
+	return c.relatedPosts.CallUnary(ctx, req)
 }
 
-// NewNestedServiceHandler builds an HTTP handler from the service implementation. It returns the
-// path on which to mount the handler and the handler itself.
+// PostServiceHandler is an implementation of the examples.nested.v1.PostService service.
+type PostServiceHandler interface {
+	// Post listing method
+	Posts(context.Context, *connect_go.Request[v1.PostsRequest]) (*connect_go.Response[v1.PostsResponse], error)
+	// related posts from a single post
+	RelatedPosts(context.Context, *connect_go.Request[v1.RelatedPostsRequest]) (*connect_go.Response[v1.RelatedPostsResponse], error)
+}
+
+// NewPostServiceHandler builds an HTTP handler from the service implementation. It returns the path
+// on which to mount the handler and the handler itself.
 //
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
-func NewNestedServiceHandler(svc NestedServiceHandler, opts ...connect_go.HandlerOption) (string, http.Handler) {
+func NewPostServiceHandler(svc PostServiceHandler, opts ...connect_go.HandlerOption) (string, http.Handler) {
 	mux := http.NewServeMux()
-	mux.Handle("/examples.nested.v1.NestedService/KitchenSink", connect_go.NewUnaryHandler(
-		"/examples.nested.v1.NestedService/KitchenSink",
-		svc.KitchenSink,
+	mux.Handle("/examples.nested.v1.PostService/Posts", connect_go.NewUnaryHandler(
+		"/examples.nested.v1.PostService/Posts",
+		svc.Posts,
 		opts...,
 	))
-	return "/examples.nested.v1.NestedService/", mux
+	mux.Handle("/examples.nested.v1.PostService/RelatedPosts", connect_go.NewUnaryHandler(
+		"/examples.nested.v1.PostService/RelatedPosts",
+		svc.RelatedPosts,
+		opts...,
+	))
+	return "/examples.nested.v1.PostService/", mux
 }
 
-// UnimplementedNestedServiceHandler returns CodeUnimplemented from all methods.
-type UnimplementedNestedServiceHandler struct{}
+// UnimplementedPostServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedPostServiceHandler struct{}
 
-func (UnimplementedNestedServiceHandler) KitchenSink(context.Context, *connect_go.Request[v1.KitchenSinkRequest]) (*connect_go.Response[v1.KitchenSinkResponse], error) {
-	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("examples.nested.v1.NestedService.KitchenSink is not implemented"))
+func (UnimplementedPostServiceHandler) Posts(context.Context, *connect_go.Request[v1.PostsRequest]) (*connect_go.Response[v1.PostsResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("examples.nested.v1.PostService.Posts is not implemented"))
+}
+
+func (UnimplementedPostServiceHandler) RelatedPosts(context.Context, *connect_go.Request[v1.RelatedPostsRequest]) (*connect_go.Response[v1.RelatedPostsResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("examples.nested.v1.PostService.RelatedPosts is not implemented"))
 }

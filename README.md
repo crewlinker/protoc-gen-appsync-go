@@ -68,8 +68,11 @@ Generating from protobuf RPC
 - [ ] MUST TEST repeated field
 - [ ] MUST TEST error of referencing service/method with resolver option that doesn't exist
 - [ ] MUST TEST error if response type of service/method doesn't match field value type
+- [ ] MUST TEST that protojson also emits empty strings if field is not optional
 - [ ] SHOULD add an "ignore" option to not add the field to the graphql schema
 - [ ] SHOULD handle empty protobuf messages not turning into invalid graphql schemas
 - [ ] SHOULD allow "default" field option (ony for input object)
 - [ ] SHOULD allow "directives" field option
 - [ ] MUST generate graphql comments from the protobuf comments
+- [ ] SHOULD research how we can allow developers to use hooks/injectors for cross-cutting concerns
+- [ ] MUST support "id" scalar

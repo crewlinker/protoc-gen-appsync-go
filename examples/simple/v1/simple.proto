@@ -4,9 +4,6 @@ package examples.simple.v1;
 // import our annotations
 import "appsync/v1/appsync.proto";
 
-// import well-known
-import "google/protobuf/empty.proto";
-
 // Example Simple service
 service SimpleService {
     // Echo method returns a string argument

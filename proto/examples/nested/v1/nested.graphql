@@ -1,3 +1,10 @@
+type Post {
+	id: String!
+	related: [Post!]!
+}
+type PostsResponse {
+	posts: [Post!]!
+}
 type Query {
-	motd: String!
+	posts: PostsResponse!
 }

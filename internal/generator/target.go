@@ -75,8 +75,6 @@ func (tg *Target) Generate(graphw, resolvew io.Writer) error {
 	formatter.NewFormatter(graphw).FormatSchema(tg.sch)
 
 	// generate and output the resolving code
-	// @TODO what if services are spread over multiple files, we'll generate one per file
-
 	if err := tg.gen.tmpl.ExecuteTemplate(resolvew, "resolve.gotmpl", TargetData{
 		File:             tg.file,
 		Resolvers:        tg.resolvers.mapped,
@@ -118,11 +116,23 @@ func (tg *Target) generateMessage(isInput bool, msg *protogen.Message) (def *ast
 	// if we're traversing the input side of the graph, create input defs instead
 	if isInput {
 		def.Kind = ast.InputObject
-		def.Name = def.Name + "Input" // prevent name collisions if
+		def.Name = def.Name + "Input" // prevent name collisions if inputs are the same message
 	}
+
+	// if it's already defined we don't do it again, else it causes infinite loops in case of recursion
+	if _, ok := tg.sch.Types[def.Name]; ok {
+		return tg.sch.Types[def.Name], nil
+	}
+
+	// add the type in the graphql schema, return the name
+	tg.sch.Types[def.Name] = def
 
 	// generate graphql field definitions for each field in the message
 	for _, fld := range msg.Fields {
+		if fopts := FieldOptions(fld); fopts != nil && fopts.Ignore != nil && *fopts.Ignore {
+			continue // skip ignored field
+		}
+
 		fdef, err := tg.generateField(isInput, fld)
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate field '%s': %w", fld.Desc.Name(), err)
@@ -131,8 +141,6 @@ func (tg *Target) generateMessage(isInput bool, msg *protogen.Message) (def *ast
 		def.Fields = append(def.Fields, fdef)
 	}
 
-	// add the type in the graphql schema, return the name
-	tg.sch.Types[def.Name] = def
 	return def, nil
 }
 
@@ -140,10 +148,11 @@ func (tg *Target) generateMessage(isInput bool, msg *protogen.Message) (def *ast
 func (tg *Target) generateField(isInput bool, fld *protogen.Field) (def *ast.FieldDefinition, err error) {
 	def = &ast.FieldDefinition{Name: fld.Desc.JSONName(), Type: &ast.Type{NonNull: true}}
 
-	// if a rpc method was configured to be resolving this field, add any arguments
+	// if a rpc method was configured to be resolving this field, add any arguments.
+	// if we're building input the fields never have arguments
 	protoQualifier := fmt.Sprintf("%s.%s", fld.Parent.Desc.Name(), fld.Desc.Name())
 	graphQualifier := fmt.Sprintf("%s.%s", fld.Parent.Desc.Name(), fld.Desc.JSONName())
-	if resolver, ok := tg.resolvers.unmapped[protoQualifier]; ok {
+	if resolver, ok := tg.resolvers.unmapped[protoQualifier]; ok && !isInput {
 		if def.Arguments, err = tg.generateArguments(fld, resolver); err != nil {
 			return nil, fmt.Errorf("failed to generate arguments: %w", err)
 		}
@@ -225,6 +234,10 @@ func (tg *Target) generateEnum(isInput bool, enum *protogen.Enum) (def *ast.Defi
 // generateArguments generates graphql arguments from the service method in the options
 func (tg *Target) generateArguments(fld *protogen.Field, res *protogen.Method) (def ast.ArgumentDefinitionList, err error) {
 	for _, infld := range res.Input.Fields {
+		if fopts := FieldOptions(infld); fopts != nil && fopts.Ignore != nil && *fopts.Ignore {
+			continue // skip argument if field is ignored
+		}
+
 		fdef, err := tg.generateField(true, infld)
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate argument field: %w", err)
